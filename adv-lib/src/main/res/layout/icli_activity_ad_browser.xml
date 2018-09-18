@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/root_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/status_bar_view"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#FFFFFFFF"
+        android:visibility="gone"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_title"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/status_bar_view"
+        android:background="#FFFFFFFF">
+
+        <com.iclicash.advlib.widget.BackView
+            android:id="@+id/back_view"
+            android:layout_width="44dp"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/tv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/back_view"
+            android:gravity="center_vertical"
+            android:paddingRight="4dp"
+            android:layout_marginLeft="-4dp"
+            android:text="关闭"
+            android:textColor="#FFAFE38E"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/tv_close"
+            android:gravity="center_vertical|left"
+            android:paddingLeft="4dp"
+            android:paddingRight="10dp"
+            android:singleLine="true"
+            android:textColor="#FF757575"
+            android:textSize="17.5sp"
+            tools:text="广告推广"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_alignParentBottom="true"
+            android:background="#FFF1EEF6"/>
+    </RelativeLayout>
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/rl_title"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:layout_below="@id/rl_title"
+        android:max="100"
+        android:progressDrawable="@drawable/iclic_webview_progress_style"/>
+
+</RelativeLayout>
