@@ -1,1 +1,1 @@
-include ':app', ':adv-lib'
+include ':app', ':ad-lib'

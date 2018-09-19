@@ -1,14 +1,14 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.iclicash.advdemo"
         minSdkVersion 14
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -18,15 +18,13 @@ android {
 
     repositories {
         flatDir {
-            dirs '../ad-lib/libs'
+            dirs 'libs'
         }
     }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-//    implementation project(':adv-lib')
-    implementation project(':ad-lib')
+    api(name: 'aiclk_nsdk_release-1.6096', ext: 'aar')
 }
