@@ -97,14 +97,15 @@
 
     <com.iclicash.advlib.ui.banner.ADBanner
         android:id="@+id/adbanner"
-        android:layout_width="370dp"
-        android:layout_height="186dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="77dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:orientation="vertical"
+        android:background="#CCCCCC"
         app:layout_constraintBottom_toTopOf="@+id/htmlbanner"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -113,8 +114,8 @@
 
     <com.iclicash.advlib.ui.banner.HTMLBanner
         android:id="@+id/htmlbanner"
-        android:layout_width="368dp"
-        android:layout_height="100dp"
+        android:layout_width="300dp"
+        android:layout_height="150dp"
         android:layout_marginBottom="82dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

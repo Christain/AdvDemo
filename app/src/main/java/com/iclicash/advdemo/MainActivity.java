@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         factory = new ICliFactory(this);
         factory.setImageAutoDownload(true);
-        factory.useDebugServer(true);
+//        factory.useDebugServer(true);
         adBanner = (ADBanner) findViewById(R.id.adbanner);
         htmlbanner = (HTMLBanner) findViewById(R.id.htmlbanner);
         adbanner_id_text = (EditText) findViewById(R.id.adbanner_text);
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 String adbanner_content = adbanner_id_text.getText().toString();
                 String htmlbanner_content = htmlbanner_id_text.getText().toString();
                 if (adbanner_content != null || adbanner_content.length() > 0)
-                    adbanner_req.InvokeADV(adbanner_content, 1, 1000, 2000); // 使 Request 发
+                    adbanner_req.InvokeADV(adbanner_content, 1, 200, 200); // 使 Request 发
                 if (htmlbanner_content != null || htmlbanner_content.length() > 0)
                     htmlbanner_req.InvokeADV(htmlbanner_content, 1, 100, 200); // 略起广告请求// 令 Factory 自动下载图片
             }
