@@ -4,59 +4,36 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
-import com.iclicash.advlib.core.AdRequest;
-import com.iclicash.advlib.core.ICliFactory;
-import com.iclicash.advlib.ui.banner.ADBanner;
-import com.iclicash.advlib.ui.banner.HTMLBanner;
+import com.assemble.ad.core.AdvFactory;
+import com.assemble.ad.core.AdvNetRequest;
+import com.assemble.ad.ui.NativeBanner;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    protected HTMLBanner htmlbanner;
-    protected ADBanner adBanner;
-    protected EditText adbanner_id_text;
-    protected EditText htmlbanner_id_text;
-    protected Button refresh;
-    protected ICliFactory factory;
+    protected NativeBanner adBanner;
+    protected Button ImageText, ImageGroup, ImageOnly, Video;
+    protected AdvFactory factory;
+    private AdvNetRequest mAdvNetRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        factory = new ICliFactory(this);
-        factory.setImageAutoDownload(true);
-//        factory.useDebugServer(true);
-        adBanner = (ADBanner) findViewById(R.id.adbanner);
-        htmlbanner = (HTMLBanner) findViewById(R.id.htmlbanner);
-        adbanner_id_text = (EditText) findViewById(R.id.adbanner_text);
-        htmlbanner_id_text = (EditText) findViewById(R.id.htmlbanner_text);
-        refresh = (Button) findViewById(R.id.refresh);
-        final AdRequest adbanner_req = factory.getADRequest();
-        adbanner_req.bindView(adBanner);
-        final AdRequest htmlbanner_req = factory.getADRequest();
-        htmlbanner_req.bindView(htmlbanner);
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String adbanner_content = adbanner_id_text.getText().toString();
-                String htmlbanner_content = htmlbanner_id_text.getText().toString();
-                if (adbanner_content != null || adbanner_content.length() > 0)
-                    adbanner_req.InvokeADV(adbanner_content, 1, 200, 200); // 使 Request 发
-                if (htmlbanner_content != null || htmlbanner_content.length() > 0)
-                    htmlbanner_req.InvokeADV(htmlbanner_content, 1, 100, 200); // 略起广告请求// 令 Factory 自动下载图片
-            }
-        });
+        adBanner = (NativeBanner) findViewById(R.id.adbanner);
+        ImageText = (Button) findViewById(R.id.image_text);
+        ImageGroup = (Button) findViewById(R.id.image_group);
+        ImageOnly = (Button) findViewById(R.id.image_only);
+        Video = (Button) findViewById(R.id.video);
+        ImageText.setOnClickListener(this);
+        ImageGroup.setOnClickListener(this);
+        ImageOnly.setOnClickListener(this);
+        Video.setOnClickListener(this);
 
-//        AdRequest request = factory.getADRequest(new ICliUtils.AdContentListener() {
-//            @Override
-//            public void AdContentListener(ICliBundle bundle) {
-//
-//            }
-//        });
-//        request.bindView(adBanner);
-//        request.InvokeADV("", 1, 1, 1);
+        factory = new AdvFactory(this);
+        mAdvNetRequest = factory.getAdvNetRequest();
+        mAdvNetRequest.bindView(adBanner);
     }
 
     @Override
@@ -72,6 +49,24 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (factory != null) {
             factory.terminate();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.image_text:
+                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_AND_TEXT, 1, 100, 200);
+                break;
+            case R.id.image_group:
+                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_GROUP, 1, 100, 200);
+                break;
+            case R.id.image_only:
+                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_PURE_IMAGE, 1, 100, 200);
+                break;
+            case R.id.video:
+                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_VIDEO, 1, 100, 200);
+                break;
         }
     }
 }
