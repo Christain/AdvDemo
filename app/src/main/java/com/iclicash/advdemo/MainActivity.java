@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_GROUP, 1, 100, 200);
                 break;
             case R.id.image_only:
-                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_PURE_IMAGE, 1, 100, 200);
+                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_PURE_IMAGE, 0, 100, 200);
                 break;
             case R.id.video:
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_VIDEO, 1, 100, 200);

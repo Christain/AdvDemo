@@ -3,6 +3,7 @@ package com.assemble.ad.core;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.assemble.ad.http.CallBackUtil;
@@ -100,6 +101,9 @@ public class AdvNetRequest {
                 mAiclkAdRequest = mICliFactory.getADRequest(new ICliUtils.AdContentListener() {
                     @Override
                     public void onContentDelivered(ICliBundle iCliBundle) {
+                        if (!TextUtils.isEmpty(iCliBundle.lastError)) {
+                            return;
+                        }
                         onShowedReport();
                     }
                 });
@@ -115,7 +119,7 @@ public class AdvNetRequest {
                     adslot = "7277638";
                     break;
                 case AdvFactory.CONTENT_PURE_IMAGE:
-                    adslot = "7463438";
+                    adslot = "7668584";
                     break;
                 case AdvFactory.CONTENT_VIDEO:
                     adslot = "7031293";
