@@ -65,12 +65,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_AND_TEXT, 1, 100, 200);
                 break;
             case R.id.image_group:
+                mApiBanner.setAdvType(AdvFactory.CONTENT_IMAGE_GROUP);
+                mApiBanner.ApiUpdateView(new ApiBundle());
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_GROUP, 1, 100, 200);
                 break;
             case R.id.image_only:
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_PURE_IMAGE, 0, 100, 200);
                 break;
             case R.id.video:
+                mApiBanner.setAdvType(AdvFactory.CONTENT_VIDEO);
+                mApiBanner.ApiUpdateView(new ApiBundle());
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_VIDEO, 1, 100, 200);
                 break;
         }
