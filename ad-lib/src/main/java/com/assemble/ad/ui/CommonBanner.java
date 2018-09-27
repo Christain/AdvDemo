@@ -1,5 +1,6 @@
 package com.assemble.ad.ui;
 
+import com.assemble.ad.core.ApiAdRequest;
 import com.iclicash.advlib.core.AdRequest;
 
 public interface CommonBanner {
@@ -11,5 +12,7 @@ public interface CommonBanner {
     void addBannerView();
 
     void setAiclkAdRequest(AdRequest adRequest);
+
+    void setApiAdRequest(ApiAdRequest apiAdRequest);
 
 }

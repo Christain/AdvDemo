@@ -15,6 +15,10 @@
         android:theme="@style/AppTheme">
 
         <meta-data
+            android:name="assemble_ad_account"
+            android:value="9139f5" />
+
+        <meta-data
             android:name="aiclk_override_adbrowser_tvtitle_text_color"
             android:value="9139f5" />
 

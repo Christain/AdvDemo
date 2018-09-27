@@ -76,7 +76,7 @@ public class AdvFactory {
      * 界面销毁时，释放工厂对象
      */
     public void terminate() {
-        if (mAdvNetRequest != null) {
+        if (mAdvNetRequest != null && mAdvNetRequest.getICliFactory() != null) {
             mAdvNetRequest.getICliFactory().terminate();
         }
     }

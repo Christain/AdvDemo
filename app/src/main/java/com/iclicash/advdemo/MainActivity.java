@@ -7,11 +7,14 @@ import android.widget.Button;
 
 import com.assemble.ad.core.AdvFactory;
 import com.assemble.ad.core.AdvNetRequest;
+import com.assemble.ad.core.ApiBundle;
+import com.assemble.ad.ui.ApiBanner;
 import com.assemble.ad.ui.NativeBanner;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected NativeBanner adBanner;
+    protected ApiBanner mApiBanner;
     protected Button ImageText, ImageGroup, ImageOnly, Video;
     protected AdvFactory factory;
     private AdvNetRequest mAdvNetRequest;
@@ -22,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         adBanner = (NativeBanner) findViewById(R.id.adbanner);
+        mApiBanner = (ApiBanner) findViewById(R.id.apibanner);
         ImageText = (Button) findViewById(R.id.image_text);
         ImageGroup = (Button) findViewById(R.id.image_group);
         ImageOnly = (Button) findViewById(R.id.image_only);
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.image_text:
+                mApiBanner.setAdvType(AdvFactory.CONTENT_IMAGE_AND_TEXT);
+                mApiBanner.ApiUpdateView(new ApiBundle());
                 mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_AND_TEXT, 1, 100, 200);
                 break;
             case R.id.image_group:

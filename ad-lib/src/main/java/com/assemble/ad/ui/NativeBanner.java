@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 import com.assemble.ad.core.AdvFactory;
+import com.assemble.ad.core.ApiAdRequest;
 import com.iclicash.advlib.core.AdRequest;
 import com.iclicash.advlib.ui.banner.ADBanner;
 import com.iclicash.advlib.ui.banner.HTMLBanner;
@@ -15,11 +16,15 @@ public class NativeBanner extends LinearLayout implements CommonBanner {
     private Context mContext;
     private AttributeSet attrs;
     private int defStyleAttr;
-    private AdRequest mAiclkAdRequest;
     private int platform;
     private int advType;
+
+    private AdRequest mAiclkAdRequest;
     private ADBanner mAiclkADBanner;
     private HTMLBanner mAiclkHtmlBanner;
+
+    private ApiAdRequest mApiAdRequest;
+    private ApiAdBanner mApiAdBanner;
 
     public NativeBanner(Context context) {
         super(context);
@@ -55,33 +60,51 @@ public class NativeBanner extends LinearLayout implements CommonBanner {
     @Override
     public void addBannerView() {
         removeAllViews();
-        if (platform == AdvFactory.PLATFORM_AICLK) {
-            switch (advType) {
-                case AdvFactory.CONTENT_IMAGE_AND_TEXT:
-                case AdvFactory.CONTENT_IMAGE_GROUP:
-                case AdvFactory.CONTENT_VIDEO:
+        switch (advType) {
+            case AdvFactory.CONTENT_IMAGE_AND_TEXT:
+            case AdvFactory.CONTENT_IMAGE_GROUP:
+            case AdvFactory.CONTENT_VIDEO:
+                if (platform == AdvFactory.PLATFORM_AICLK) {
                     if (mAiclkADBanner == null) {
                         mAiclkADBanner = new ADBanner(mContext, attrs, defStyleAttr);
                     }
                     addView(mAiclkADBanner);
                     mAiclkAdRequest.bindView(mAiclkADBanner);
-                    break;
-                case AdvFactory.CONTENT_PURE_IMAGE:
+                } else {
+                    if (mApiAdBanner == null) {
+                        mApiAdBanner = new ApiAdBanner(mContext, attrs, defStyleAttr);
+                        mApiAdBanner.setApiAdRequest(mApiAdRequest);
+                    }
+                    mApiAdBanner.setAdvType(advType);
+                    addView(mApiAdBanner);
+                    mApiAdRequest.bindView(mApiAdBanner);
+                }
+                break;
+            case AdvFactory.CONTENT_PURE_IMAGE:
+                if (platform == AdvFactory.PLATFORM_AICLK) {
                     if (mAiclkHtmlBanner == null) {
                         mAiclkHtmlBanner = new HTMLBanner(mContext, attrs, defStyleAttr);
                     }
                     addView(mAiclkHtmlBanner);
                     mAiclkAdRequest.bindView(mAiclkHtmlBanner);
-                    break;
-            }
-        } else {
-
+                } else {
+                    if (mAiclkHtmlBanner == null) {
+                        mAiclkHtmlBanner = new HTMLBanner(mContext, attrs, defStyleAttr);
+                    }
+                    addView(mAiclkHtmlBanner);
+                    mAiclkAdRequest.bindView(mAiclkHtmlBanner);
+                }
+                break;
         }
     }
 
     @Override
     public void setAiclkAdRequest(AdRequest adRequest) {
         this.mAiclkAdRequest = adRequest;
+    }
 
+    @Override
+    public void setApiAdRequest(ApiAdRequest apiAdRequest) {
+        this.mApiAdRequest = apiAdRequest;
     }
 }
