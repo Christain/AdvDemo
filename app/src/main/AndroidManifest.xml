@@ -15,8 +15,8 @@
         android:theme="@style/AppTheme">
 
         <meta-data
-            android:name="assemble_ad_account"
-            android:value="9139f5" />
+            android:name="union_app_id"
+            android:value="52oMdyprg5AYS3Qy" />
 
         <meta-data
             android:name="aiclk_override_adbrowser_tvtitle_text_color"

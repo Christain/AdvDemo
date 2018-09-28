@@ -6,6 +6,7 @@ public class RatioBean {
     private int id;
     private String name;
     private int ratio;
+    private String method;
 
     public int getId() {
         return id;
@@ -29,5 +30,13 @@ public class RatioBean {
 
     public void setRatio(int ratio) {
         this.ratio = ratio;
+    }
+
+    public String getMethod() {
+        return (method != null) ? method : "";
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }

@@ -216,7 +216,11 @@ public class RealRequest {
         RealResponse response = new RealResponse();
         response.code = conn.getResponseCode();
         response.contentLength = conn.getContentLength();
-        response.inputStream = conn.getInputStream();
+        try {
+            response.inputStream = conn.getInputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         response.errorStream = conn.getErrorStream();
         return response;
     }

@@ -3,6 +3,7 @@ package com.assemble.ad.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.assemble.ad.Constants;
@@ -19,10 +20,12 @@ import java.util.ArrayList;
 
 public class PlatformUtil {
 
+    private Activity mActivity;
     private SharedPreferences mSharedPreferences;
     private PlatformListener mListener;
 
     public PlatformUtil(Activity activity, PlatformListener listener) {
+        this.mActivity = activity;
         this.mSharedPreferences = activity.getSharedPreferences("sp_adv_data", Context.MODE_PRIVATE);
         this.mListener = listener;
         checkPlatform();
@@ -31,11 +34,15 @@ public class PlatformUtil {
     private void checkPlatform() {
         String cacheTime = mSharedPreferences.getString("TIME", "");
         final String nowTime = TimeUtil.getFormatedTime("yyyy-MM-dd", System.currentTimeMillis());
-        if (cacheTime.equals(nowTime)) {
+        if (!cacheTime.equals(nowTime)) {
             randomRatio();
         } else {
             //TODO 接口获取最新的广告占比
-            UrlHttpUtil.get(Constants.HOST + "/api/channel/ratio", new CallBackUtil.CallBackString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(Constants.HOST + "/api/channel/ratio");
+            sb.append("?app_id=");
+            sb.append(AppUtil.getAppMetaData(mActivity, "union_app_id"));
+            UrlHttpUtil.get(sb.toString(), new CallBackUtil.CallBackString() {
                 @Override
                 public void onFailure(int code, String errorMessage) {
                     Log.e("PlatformUtil", "code=" + code + "  error=" + errorMessage);
@@ -44,11 +51,11 @@ public class PlatformUtil {
 
                 @Override
                 public void onResponse(String response) {
-                    response = "{\"code\":200,\"data\":[{\"id\":1,\"name\":\"Fahey, Rosenbaum and Rutherford\",\"ratio\":78},{\"id\":2,\"name\":\"Wolff-Schmitt\",\"ratio\":22}]}";
                     try {
                         JSONObject object = new JSONObject(response);
                         int code = object.optInt("code");
                         if (code == 200) {
+                            mSharedPreferences.edit().putString("KEY", object.optString("key"));
                             mSharedPreferences.edit().putString("TIME", nowTime).apply();
                             mSharedPreferences.edit().putString("RATIO_DATA", object.optString("data", "")).apply();
                         }
@@ -64,6 +71,10 @@ public class PlatformUtil {
 
     private void randomRatio() {
         String ratioData = mSharedPreferences.getString("RATIO_DATA", "");
+        if (TextUtils.isEmpty(ratioData)) {
+            mListener.platform(AdvFactory.PLATFORM_AICLK);
+            return;
+        }
         int total_ratio = 0;
         ArrayList<RatioBean> list = new ArrayList<>();
         try {
@@ -74,6 +85,7 @@ public class PlatformUtil {
                 bean.setId(obj.optInt("id"));
                 bean.setName(obj.optString("name"));
                 bean.setRatio(obj.optInt("ratio"));
+                bean.setMethod(obj.optString("method"));
                 list.add(bean);
                 total_ratio = total_ratio + bean.getRatio();
             }
@@ -89,21 +101,21 @@ public class PlatformUtil {
         for (int i = 0; i < list.size(); i++) {
             ratio = ratio + list.get(i).getRatio();
             if (random <= ratio) {
-                switchPlatform(list.get(i).getId());
+                switchPlatform(list.get(i).getMethod());
                 return;
             }
         }
     }
 
-    private void switchPlatform(int id) {
+    private void switchPlatform(String method) {
         if (mListener == null) {
             return;
         }
-        switch (id) {
-            case 1:
+        switch (method) {
+            case "sdk":
                 mListener.platform(AdvFactory.PLATFORM_AICLK);
                 break;
-            case 2:
+            case "api":
                 mListener.platform(AdvFactory.PLATFORM_OTHER);
                 break;
              default:
