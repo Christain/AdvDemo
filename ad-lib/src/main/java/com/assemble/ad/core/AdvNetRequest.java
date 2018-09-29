@@ -51,8 +51,7 @@ public class AdvNetRequest {
         }
         if (!(advType == AdvFactory.CONTENT_IMAGE_AND_TEXT
                 || advType == AdvFactory.CONTENT_IMAGE_GROUP
-                || advType == AdvFactory.CONTENT_PURE_IMAGE
-                || advType == AdvFactory.CONTENT_VIDEO)) {
+                || advType == AdvFactory.CONTENT_PURE_IMAGE)) {
             Log.e(TAG, "advType is error");
             return;
         }
@@ -63,13 +62,13 @@ public class AdvNetRequest {
 
         new PlatformUtil(mActivity, new PlatformUtil.PlatformListener() {
             @Override
-            public void platform(int platform) {
-                setAdvPlatform(platform);
+            public void platform(int platform, String name) {
+                setAdvPlatform(platform, name);
             }
         });
     }
 
-    private void setAdvPlatform(int platform) {
+    private void setAdvPlatform(int platform, String name) {
         banner.setPlatform(platform);
         banner.setAdvType(advType);
         String adslot = null;
@@ -81,10 +80,7 @@ public class AdvNetRequest {
                 adslot = "7277638";
                 break;
             case AdvFactory.CONTENT_PURE_IMAGE:
-                adslot = "7668584";
-                break;
-            case AdvFactory.CONTENT_VIDEO:
-                adslot = "7031293";
+                adslot = "7112926";
                 break;
         }
         if (platform == AdvFactory.PLATFORM_AICLK) {
@@ -111,7 +107,7 @@ public class AdvNetRequest {
                 banner.setApiAdRequest(mApiAdRequest);
             }
             banner.addBannerView();
-            mApiAdRequest.InvokeADV(adslot, material, height, width);
+            mApiAdRequest.InvokeADV(adslot, name, material, height, width);
         }
     }
 

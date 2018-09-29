@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.assemble.ad.Constants;
 import com.assemble.ad.bean.RatioBean;
@@ -41,11 +42,16 @@ public class PlatformUtil {
             StringBuilder sb = new StringBuilder();
             sb.append(Constants.HOST + "/api/channel/ratio");
             sb.append("?app_id=");
-            sb.append(AppUtil.getAppMetaData(mActivity, "union_app_id"));
+            String app_id = AppUtil.getAppMetaData(mActivity, "union_app_id");
+            if (TextUtils.isEmpty(app_id)) {
+                Toast.makeText(mActivity, "Plaese add app_id int AndroidManifest.xml", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            sb.append(app_id);
             UrlHttpUtil.get(sb.toString(), new CallBackUtil.CallBackString() {
                 @Override
                 public void onFailure(int code, String errorMessage) {
-                    Log.e("PlatformUtil", "code=" + code + "  error=" + errorMessage);
+                    Log.e("PlatformUtil", "error=" + errorMessage);
                     randomRatio();
                 }
 
@@ -55,7 +61,7 @@ public class PlatformUtil {
                         JSONObject object = new JSONObject(response);
                         int code = object.optInt("code");
                         if (code == 200) {
-                            mSharedPreferences.edit().putString("KEY", object.optString("key"));
+                            mSharedPreferences.edit().putString("KEY", object.optString("key")).apply();
                             mSharedPreferences.edit().putString("TIME", nowTime).apply();
                             mSharedPreferences.edit().putString("RATIO_DATA", object.optString("data", "")).apply();
                         }
@@ -71,8 +77,9 @@ public class PlatformUtil {
 
     private void randomRatio() {
         String ratioData = mSharedPreferences.getString("RATIO_DATA", "");
-        if (TextUtils.isEmpty(ratioData)) {
-            mListener.platform(AdvFactory.PLATFORM_AICLK);
+        String key = mSharedPreferences.getString("KEY", "");
+        if (TextUtils.isEmpty(ratioData) || TextUtils.isEmpty(key)) {
+            mListener.platform(AdvFactory.PLATFORM_AICLK, "");
             return;
         }
         int total_ratio = 0;
@@ -93,7 +100,7 @@ public class PlatformUtil {
             e.printStackTrace();
         }
         if (list.size() == 0) {
-            mListener.platform(AdvFactory.PLATFORM_AICLK);
+            mListener.platform(AdvFactory.PLATFORM_AICLK, "");
             return;
         }
         int random = (int) (Math.random() * total_ratio);
@@ -101,30 +108,30 @@ public class PlatformUtil {
         for (int i = 0; i < list.size(); i++) {
             ratio = ratio + list.get(i).getRatio();
             if (random <= ratio) {
-                switchPlatform(list.get(i).getMethod());
+                switchPlatform(list.get(i).getMethod(), list.get(i).getName());
                 return;
             }
         }
     }
 
-    private void switchPlatform(String method) {
+    private void switchPlatform(String method, String name) {
         if (mListener == null) {
             return;
         }
         switch (method) {
             case "sdk":
-                mListener.platform(AdvFactory.PLATFORM_AICLK);
+                mListener.platform(AdvFactory.PLATFORM_AICLK, name);
                 break;
             case "api":
-                mListener.platform(AdvFactory.PLATFORM_OTHER);
+                mListener.platform(AdvFactory.PLATFORM_OTHER, name);
                 break;
              default:
-                 mListener.platform(AdvFactory.PLATFORM_AICLK);
+                 mListener.platform(AdvFactory.PLATFORM_AICLK, name);
                  break;
         }
     }
 
     public interface PlatformListener {
-        void platform(int platform);
+        void platform(int platform, String name);
     }
 }

@@ -18,7 +18,7 @@ public class AdvFactory {
     public static final int CONTENT_IMAGE_AND_TEXT = 0x104;
     public static final int CONTENT_PURE_IMAGE = 0x105;
     public static final int CONTENT_IMAGE_GROUP = 0x106;
-    public static final int CONTENT_VIDEO = 0x107;
+//    public static final int CONTENT_VIDEO = 0x107;
 
     private Activity mActivity;
     private AdvNetRequest mAdvNetRequest;

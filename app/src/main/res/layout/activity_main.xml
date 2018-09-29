@@ -31,10 +31,11 @@
             android:layout_width="0.0dp"
             android:layout_weight="1.0"
             android:layout_height="48dp"
-            android:text="纯图"/>
+            android:text="大图"/>
 
         <Button
             android:id="@+id/video"
+            android:visibility="gone"
             android:layout_width="0.0dp"
             android:layout_weight="1.0"
             android:layout_height="48dp"

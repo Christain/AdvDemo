@@ -10,12 +10,12 @@ public class ParamUtil {
     public static String ParamJson(Context mContext, String adslot, int material, int height, int width) {
         ParamBean bean = new ParamBean();
 
-        //request
-        ParamBean.RequestBean requestBean = new ParamBean.RequestBean();
-        requestBean.setApp_id("app_id");
-        requestBean.setSecurity_key("security_key");
-        requestBean.setSign("sign");
-        requestBean.setSsp("api");
+//        //request
+//        ParamBean.RequestBean requestBean = new ParamBean.RequestBean();
+//        requestBean.setApp_id("app_id");
+//        requestBean.setSecurity_key("security_key");
+//        requestBean.setSign("sign");
+//        requestBean.setSsp("api");
 
         //param
         ParamBean.ParamEntity paramEntity = new ParamBean.ParamEntity();
@@ -42,7 +42,7 @@ public class ParamUtil {
         mediaEntity.setApp(appEntity);
         paramEntity.setMedia(mediaEntity);
 
-        bean.setRequest(requestBean);
+//        bean.setRequest(requestBean);
         bean.setParam(paramEntity);
         String json = SimpleJson.toJson(bean).replaceAll("\\,\\}", "}");
 

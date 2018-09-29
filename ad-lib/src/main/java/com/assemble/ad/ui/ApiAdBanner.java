@@ -70,15 +70,13 @@ public class ApiAdBanner extends LinearLayout implements ApiBanner {
             case AdvFactory.CONTENT_IMAGE_GROUP:
                 imageGroup();
                 break;
-            case AdvFactory.CONTENT_VIDEO:
-                video();
-                break;
             case AdvFactory.CONTENT_PURE_IMAGE:
-
+                bigImage();
                 break;
         }
     }
 
+    //图文类型
     private void imageAndText() {
         LinearLayout layout = new LinearLayout(mContext);
         layout.setOrientation(HORIZONTAL);
@@ -138,6 +136,7 @@ public class ApiAdBanner extends LinearLayout implements ApiBanner {
         setVisibility(VISIBLE);
     }
 
+    //组图类型
     private void imageGroup() {
         LinearLayout layout = new LinearLayout(mContext);
         layout.setOrientation(VERTICAL);
@@ -224,7 +223,61 @@ public class ApiAdBanner extends LinearLayout implements ApiBanner {
         setVisibility(VISIBLE);
     }
 
-    private void video() {
+    //大图类型
+    private void bigImage() {
+        LinearLayout layout = new LinearLayout(mContext);
+        layout.setOrientation(VERTICAL);
+        LinearLayout.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layout.setLayoutParams(layoutParams);
 
+        //Title
+        TextView title = new TextView(mContext);
+        LinearLayout.LayoutParams titleParam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        title.setLayoutParams(titleParam);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18f);
+        title.setText("免费大礼等你来拿，速领！");
+        title.setMaxLines(2);
+        title.setEllipsize(TextUtils.TruncateAt.END);
+        title.setTextColor(0xFF2E3230);
+
+        //图片
+        ImageView image = new ImageView(mContext);
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        image.setBackgroundColor(0xFF4e4e4e);
+        LinearLayout.LayoutParams imageParam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AppUtil.dip2px(mContext, 160));
+        imageParam.topMargin = AppUtil.dip2px(mContext, 4);
+        imageParam.bottomMargin = AppUtil.dip2px(mContext, 6);
+        image.setLayoutParams(imageParam);
+
+        //”广告“文字
+        TextView adTag = new TextView(mContext);
+        LinearLayout.LayoutParams tagParam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        adTag.setLayoutParams(tagParam);
+        adTag.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14f);
+        adTag.setText("广告");
+        adTag.setTextColor(0xFF737373);
+
+        layout.addView(title);
+        layout.addView(image);
+        layout.addView(adTag);
+        addView(layout);
+
+        //点击
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, ADBrowser.class);
+                intent.setAction("http://www.baidu.com");
+                mContext.startActivity(intent);
+                if (mApiAdRequest != null) {
+                    mApiAdRequest.onApiClickedReport();
+                }
+            }
+        });
+        //已显示
+        if (mApiAdRequest != null) {
+            mApiAdRequest.onApiShowedReport();
+        }
+        setVisibility(VISIBLE);
     }
 }

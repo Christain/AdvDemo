@@ -63,7 +63,7 @@ public class NativeBanner extends LinearLayout implements CommonBanner {
         switch (advType) {
             case AdvFactory.CONTENT_IMAGE_AND_TEXT:
             case AdvFactory.CONTENT_IMAGE_GROUP:
-            case AdvFactory.CONTENT_VIDEO:
+            case AdvFactory.CONTENT_PURE_IMAGE:
                 if (platform == AdvFactory.PLATFORM_AICLK) {
                     if (mAiclkADBanner == null) {
                         mAiclkADBanner = new ADBanner(mContext, attrs, defStyleAttr);
@@ -78,21 +78,6 @@ public class NativeBanner extends LinearLayout implements CommonBanner {
                     mApiAdBanner.setAdvType(advType);
                     addView(mApiAdBanner);
                     mApiAdRequest.bindView(mApiAdBanner);
-                }
-                break;
-            case AdvFactory.CONTENT_PURE_IMAGE:
-                if (platform == AdvFactory.PLATFORM_AICLK) {
-                    if (mAiclkHtmlBanner == null) {
-                        mAiclkHtmlBanner = new HTMLBanner(mContext, attrs, defStyleAttr);
-                    }
-                    addView(mAiclkHtmlBanner);
-                    mAiclkAdRequest.bindView(mAiclkHtmlBanner);
-                } else {
-                    if (mAiclkHtmlBanner == null) {
-                        mAiclkHtmlBanner = new HTMLBanner(mContext, attrs, defStyleAttr);
-                    }
-                    addView(mAiclkHtmlBanner);
-                    mAiclkAdRequest.bindView(mAiclkHtmlBanner);
                 }
                 break;
         }
