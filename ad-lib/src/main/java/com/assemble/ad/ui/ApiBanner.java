@@ -1,14 +1,14 @@
 package com.assemble.ad.ui;
 
 
-import com.assemble.ad.core.ApiAdRequest;
-import com.assemble.ad.core.ApiBundle;
+import com.assemble.ad.bean.AdvBean;
+import com.assemble.ad.core.ApiRequest;
 
 public interface ApiBanner {
 
     void setAdvType(int advType);
 
-    void setApiAdRequest(ApiAdRequest apiAdRequest);
+    void setApiRequest(ApiRequest apiRequest);
 
-    void ApiUpdateView(ApiBundle apiBundle);
+    void ApiUpdateView(AdvBean advBean);
 }

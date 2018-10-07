@@ -219,7 +219,7 @@ public class RealRequest {
         try {
             response.inputStream = conn.getInputStream();
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
         response.errorStream = conn.getErrorStream();
         return response;

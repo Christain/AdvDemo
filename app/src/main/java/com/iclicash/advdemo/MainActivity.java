@@ -7,7 +7,6 @@ import android.widget.Button;
 
 import com.assemble.ad.core.AdvFactory;
 import com.assemble.ad.core.AdvNetRequest;
-import com.assemble.ad.core.ApiBundle;
 import com.assemble.ad.ui.ApiBanner;
 import com.assemble.ad.ui.NativeBanner;
 
@@ -60,22 +59,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.image_text:
-                mApiBanner.setAdvType(AdvFactory.CONTENT_IMAGE_AND_TEXT);
-                mApiBanner.ApiUpdateView(new ApiBundle());
-                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_AND_TEXT, 1, 100, 200);
+                mAdvNetRequest.InvokeADV("3", 100, 200);
                 break;
             case R.id.image_group:
-                mApiBanner.setAdvType(AdvFactory.CONTENT_IMAGE_GROUP);
-                mApiBanner.ApiUpdateView(new ApiBundle());
-                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_IMAGE_GROUP, 1, 100, 200);
+                mAdvNetRequest.InvokeADV("2", 100, 200);
                 break;
             case R.id.image_only:
-                mApiBanner.setAdvType(AdvFactory.CONTENT_PURE_IMAGE);
-                mApiBanner.ApiUpdateView(new ApiBundle());
-                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_PURE_IMAGE, 1, 100, 200);
-                break;
-            case R.id.video:
-//                mAdvNetRequest.InvokeADV(AdvFactory.CONTENT_VIDEO, 1, 100, 200);
+                mAdvNetRequest.InvokeADV("1", 100, 200);
                 break;
         }
     }

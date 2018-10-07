@@ -1,20 +1,21 @@
 ## 接口说明
 
-所有接口都需要传递`query`参数`sign`与`app_id`，`sign`为接口签名，`app_id`为账号。
+所有接口都需要传递`query`参数`app_id`与`sign`(占比接口只传`app_id`)，`sign`为接口签名，`app_id`为该SDK的`app_id`。
 
 所有接口都是返回`json`。接口返回状态可以通过`http`状态码或者接口数据中`code`判断。
 
-当接口正常返回时`http`状态码为200，`code`为200.
+当接口正常返回时`http`状态码为200，`code`为200。
 
 ```json
 {
     "code": 200,
     "message": "ok",
-    "data": [
-      ....
-    ]
+    "data": {
+        "key": "value"
+    }
 }
 ```
+
 当`sign`验证失败时，接口返回`http`状态为401，返回`json`为：
 
 ```json
@@ -25,7 +26,7 @@
 }
 ```
 
-当`app_id`账号不可用时，接口返回`http`状态为403，返回`json`为：
+当`app_id`不可用时，接口返回`http`状态为403，返回`json`为：
 
 ```json
 {
@@ -45,77 +46,144 @@
 }
 ```
 
+当请求渠道API发生错误，或者渠道API返回了错误时。接口返回`http`状态为200，返回`json`为：
+
+```json
+{
+    "code": 400,
+    "message": "当前广告位没上线",
+    "data": null
+}
+```
+
 可通过`message`获取错误信息。
 
 ## sign方法
 
+将除开`sign`外的`query`与`post`参数，放入字典中，对字典做一个字典排序，依次把所有key value连接成一个字符串，在加上签名的干扰字符串，对整个字符串做一次`hash`。
+
+如请求的url为`{host}/api/ad?sign=xx&app_id=afgasgas`, `post`有一个为`param`的参数，当post参数的值为一个json时，把json当成一个字符串处理,如：
+
+```json
+param = {"media":{"app":{"package_name":"InternetRadio.all","app_version":"1.2.3"},"type":1,"site":{"domain":"xx","urls":"xx","title":"xx","keywords":"xx"},"browser":{"user_agent":"xx"}},"client":{"type":3,"version":"1.6.4"},"device":{"id_idfa":"ssss","id_imei":"xxxx","height":1136,"width":640,"brand":"apple","model":"iPhone6","os_version":"1.1.2","os_type":1},"adslot":{"id":"5000188","type":1,"height":100,"width":640},"network":{"type":1,"ip":"218.66.169.71"}}
+```
+
+把参数转换成字典，同时把`query`参数`app_id`放进去。转换后的字典为：
+
+```
+dict = [
+    'param' : '{"media": {"type": 1,"app": {"package_name": "InternetRadio.all","app_version": "1.2.3"},"site":{"domain":"xx","urls":"xx","title":"xx","keywords":"xx"},"browser":{"user_agent":"xx"}}',
+    'app_id' : 'afgasgas'
+];
+```
+
+依次对字典做字典排序，结果如下：
+
+```
+dict = [
+    'app_id' : 'afgasgas',
+    'param' : '{"media": {"type": 1,"app": {"package_name": "InternetRadio.all","app_version": "1.2.3"},"site":{"domain":"xx","urls":"xx","title":"xx","keywords":"xx"},"browser":{"user_agent":"xx"}}',
+];
+```
+
+依次把`key`,`value`连接起来：
+
+```
+app_idafgasgasparam{"media": {"type": 1,"app": {"package_name": "InternetRadio.all","app_version": "1.2.3"},"site":{"domain":"xx","urls":"xx","title":"xx","keywords":"xx"},"browser":{"user_agent":"xx"}}
+```
+
+处理干扰字符串`8a0e6abaf53399569cdb2e78a6b8b365`：
+
+做hash：
+
+`f885b3450b08441c50feab28b79e39bd`
+
+翻转：
+
+`db93e97b82baef05c14480b0543b588f`
+
+取前16位放上面字符串的开头，后16位放末尾：
+
+`db93e97b82baef05{"media": {"type": 1,"app": {"package_name": "InternetRadio.all","app_version": "1.2.3"},"site":{"domain":"xx","urls":"xx","title":"xx","keywords":"xx"},"browser":{"user_agent":"xx"}}c14480b0543b588f`
+
+对整个字符串做hash就为sign：`02f40a56a9b388fbc4a551f304abc131`
+
+最后的url为：
+
+`{host}/api/ad?sign=02f40a56a9b388fbc4a551f304abc131&app_id=afgasgas`
 
 ## 获取广告接口
 
-`post` `{host}/api/ad?sign=xxx&app_id=xxx&ssp=aiclk`
-
-### header
-
-`Content-Type: application/json`
+`post` `{host}/api/ad?sign=xxx&app_id=xxx`
 
 ### 参数
 
+#### header
+
+`Content-Type : application/x-www-form-urlencoded`
+
 #### query参数
 
-`sign`接口签名
+`sign` 接口签名
 
-`app_id`账号ID
-
-`channel`ssp平台
+`app_id` 账号ID
 
 #### post参数
 
-`post`为`json`数据:
+`ad_place_id` 媒体广告位ID 
 
-```json
-{
-	"param": {                   // param为对应请求SSP API的参数，每个API都可能不相同
-		"media": {
-			"type": 1,
-			"app": {
-				"package_name": "InternetRadio.all",
-				"app_version": "1.2.3"
-			},
-			"site":{
-				"domain":"xx",
-				"urls":"xx",
-				"title":"xx",
-				"keywords":"xx"
-			},
-			"browser":{
-				"user_agent":"xx"
-			}
-		},  
-		"client": {
-			"type": 3,
-			"version":"1.6.4"
-		},
-		"device": {
-			"id_idfa":"ssss",
-			"id_imei":"xxxx",
-			"height": 1136,
-			"width": 640,
-			"brand": "apple",
-			"model": "iPhone6",
-			"os_version": "1.1.2",
-			"os_type": 1
-		},
-		"adslot": {
-			"id": "5000188",
-			"type": 1,
-			"height": 100,
-			"width": 640
-		},
-		"network": {
-			"type": 1,
-			"ip": "218.66.169.71"
-		}
-	}
+`channel_id` 渠道ID
+
+`channel_ad_place_id` 渠道广告位ID
+
+`param` 请求对应渠道API的参数，为`json`数据。
+
+请求示例参数：
+
+```
+ad_place_id = 1，
+channel_id =1，
+param = {
+  "media": {
+    "app": {
+      "package_name":"InternetRadio.all",
+      "app_version":"1.2.3"
+    },
+    "type":1,
+    "site": {
+      "domain":"xx",
+      "urls":"xx",
+      "title":"xx",
+      "keywords":"xx"
+    },
+  "browser": {
+    "user_agent":"Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36"
+    }
+   },
+  "client": {
+    "type":3,
+    "version":"1.6.4"
+  },
+  "device": {
+    "id_idfa":"ssss",
+    "id_imei":"xxxx",
+    "height":1136,
+    "width":640,
+    "brand":"apple",
+    "model":"iPhone6",
+    "os_version":"1.1.2",
+    "os_type": 1
+  },
+  "adslot": {
+    "id":"7112926",
+    "type":1,
+    "height":100,
+    "width":640
+  },
+  "network": {
+    "type":1,
+    "ip":"218.66.169.71"
+  }
 }
 ```
 
@@ -129,29 +197,39 @@
     "code": 200,
     "message": "ok",
     "data": {
-        "ads": {
-            "material_type": 0,
-            "html_snippet": "<!DOCTYPE html><html lang=\"en\"\nstyle=\"height:100%;\"><head><meta charset=\"UTF-8\"><meta name=\"apple-touchfullscreen\"\ncontent=\"YES\" /><meta name=\"format-detection\" content=\"telephone=no\"\n/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, minimumscale=1.0,\nmaximum-scale=1.0,user-scalable=no\"><meta name=\"apple-mobile-web-appcapable\"\ncontent=\"yes\" /><meta name=\"apple-mobile-web-app-status-bar-style\"\ncontent=\"black\" /><meta name=\"viewport\"/><title></title><style>#picBox img\n{width: 100%;}.i_gx3_img_div {-webkit-box-flex: 1;-ms-flex: 1;flex: 1;\nmargin-right: .1rem; box-sizing: border-box; -webkit-box-sizing: borderbox;padding:\n.22rem 0;margin: 0;position: relative; -webkit-tap-highlight-color:\nrgba(231,231,231,0.6);}.i_gx3_img_div {marginright:\n.2rem;}</style></head><body style=\"height:100%;margin: 0;box-sizing: borderbox;\"><div\nclass=\"single\" style=\"<!-- height:100% -->\" id=\"i-container\"><a id=\"aBox\"\nstyle=\"padding: 5px 0;text-decoration: none;height: 100%;overflow: hidden;display: -webkitbox;border-bottom:\n1px solid #f2f2f2;-webkit-tap-highlight-color: transparent;-webkit-taphighlight-color:\ntransparent;box-sizing: border-box;\"\nhref=\"http://yuan.51oneone.com?iclicashsid=84c6351be8f389c882616d90834e4b243d18d262\\\n\" target=\"_top\"><div id=\"textBox\" style=\"-webkit-box-flex: 1;height: 100%;position:\nrelative;display: -webkit-box;display: -moz-box;display: -ms-flexbox;display: -webkitflex;display:flex;align-items:\ncenter;\"><h3 id=\"title\" style=\"font-size: 16px;color: #000;lineheight:\n24px;height: 44px;overflow: hidden;font-weight: normal;margin:0;color:\n#2b2b2b;\"></h3><p style=\" height: 15px;padding-top: 4px;position: absolute;bottom:\n0;right: 0;margin:0;\"><span style=\"float: right;font-size: 11px;color: #999;\"> 广 告\n</span></p></div><div id=\"picBox\" style=\"width: 90px;margin-left: 15px;position:\nrelative;display: -webkit-box;display: -moz-box;display: -ms-flexbox;display: -webkitflex;display:flex;align-items:\ncenter;\"><img style=\"width: 100%;\"\nsrc=\"\"></div></a></div><div class=\"multi\" style=\"<!-- height:100% -->\" id=\"icontainer\"><a\nid=\"aBox\" style=\"padding: 5px 0;text-decoration: none;height:\n100%;overflow: hidden;border-bottom: 1px solid #f2f2f2;-webkit-tap-highlight-color:\ntransparent;-webkit-tap-highlight-color: transparent;box-sizing: border-box;display:\nblock;position:relative;\"\nhref=\"http://yuan.51oneone.com?iclicashsid=84c6351be8f389c882616d90834e4b243d18d262\\\n\" target=\"_top\"><div id=\"textBox\" style=\"-webkit-box-flex: 1;position: relative;display: -\n14\nwebkit-box;display: -moz-box;display: -ms-flexbox;display: -webkit-flex;display:flex;align-items:\ncenter;\"><h3 id=\"title\" style=\"font-size: 16px;color: #000;line-height: 34px;height:\n34px;overflow: hidden;font-weight: normal;margin:0;color: #2b2b2b;\"></h3></div><div\nid=\"picBox\" style=\"position: relative;display: -webkit-box;display: -moz-box;display: -msflexbox;display:\n-webkit-flex;display:flex;align-items: center;\"><figure\nclass=\"i_gx3_img_div\"><img src=\"\"></figure><figure class=\"i_gx3_img_div\"><img\nsrc=\"\"></figure><figure class=\"i_gx3_img_div\" style=\"margin-right:0;\"><img\nsrc=\"\"></figure></div><p id=\"adText\" style=\"height: 15px;padding-top:\n4px;margin:0;\"><span style=\"float: right;font-size: 11px;color: #999;\"> 广 告\n</span></p></a></div><script>(function (w) { var d =\ndocument.documentElement; var globalBody = document.body; var f = 'currentFontSize';\nvar attr = 'setAttribute'; var b = 10; var W = 320; var t = (w.Modernizr && Modernizr.touch\n=== true) || (function () { return !!(('ontouchstart' in w) || w.DocumentTouch && document\ninstanceof DocumentTouch); })(); function setFontSize() { var fs = d.clientWidth / W *\nb; fs === d[f] || (d.style.fontSize = fs + 'px', d[f] = fs); } setFontSize();\nwindow.addEventListener('resize', setFontSize);function log(url) { var img =\ndocument.createElement('img'); img[attr]('src', url); img[attr]('style', 'display:none;');\nglobalBody.appendChild(img); } function cl(bindTarget) { var focusing = false;\nbindTarget.addEventListener(t ? 'touchstart' : 'mousedown', function (event) {\nfocusing = true; }); bindTarget.addEventListener(t ? 'touchmove' : 'mousemove',\nfunction (event) { focusing = false; });\nbindTarget.addEventListener(t ? 'touchend' : 'mouseup', function (event) { if\n(!focusing) { return false; } focusing = false; if\n(cl.logs && cl.logs.length) { cl.logs.forEach(log); cl.logs =\nnull; } }); } w.regClickLog = function (logs) { cl.logs = (cl.logs\n|| []).concat(logs); }; var i = document.getElementById('i-container'); i &&\ncl(i);}(window));window.regClickLog &&\nwindow.regClickLog([\"http://clickc.admaster.com.cn/c/a89643,b1853655,c3217,i0,m10\n1,8a2,8b3,0a__1__,n__MAC__,z__ssss__,f__IP__,t__TS__,0c____,o__OPENUDID__,h\",\"http://\n180.169.79.250:8899/click?CAAQMQ.zNNTdOrlh-h-eEiVcE_CU-rSh-rJU8hXeCmSUOreFBlh8glUqmXwFmoe8ghXdW_oKBrXjddlrlsFrHgwONKUONKUOPTNuHNdrhXUONKwENKNEHNm\nrrg9NPmF_8HNnHyzPUmnmPhlKPHlrUJNlNukruTuNruPiuVEKGexaylLOH7WvRAhkJ6eEi7DC57DCB\n6hqjQMqR8DFR8hYeHLqRnMErlh-h-eEiVcE_CU-rSh-rJU8hXeCmSUOreFBlh8glUqmXwFmoe83ouNruPrusOqeqLCA7cF5ZMkeqLRjqUYH3hCRncFUsUENKfrQGD9yRLRyoc\n-HXUgguNgHumrrzPrrgNuNNFNNrNuHdzNUTuae-LvUhNErNmry-Lve-TVNSUUqck3CU8BKwO2nwEi8wOPJckBqcERRh-gSc8_8UcguONrOPrrgNuNNFNNrNdguOlXuBiyMBzATEuOwicwTdNFNN\",]);</script><img\nstyle=\"display:none\"\nsrc=\"http://v.admaster.com.cn/i/a89643,b1853655,c3217,i0,m202,8a2,8b3,0a__1__,n__MAC__,\nz__ssss__,f__IP__,t__TS__,0c____,o__OPENUDID__,h\"><img style=\"display:none\"\nsrc=\"http://180.169.79.250:8899/show?CAAQEw.9j_8qAHQ-X-X1SYhcSxRtXHl-XH0tbC1RmltAHX1BLQ-b6QtTmCyBmD1b6-CqWxDKLHCwqqQHQZBHG6yAjKtAjKtA_8jkGjqHCtAjKySjKjSGjmHH6Oj_mBxbGj5Gf9_tm5m_-\nQK_GQHt0jQjkLHm6j3kmeHm6j36jUHwbrOau2T3d2AMbrOaErbYZ97agcB3byb_KtnGW47lQczaL\neReZtS9qj3m6jx669jjmjkHj6jj0j_6_ep1XeZjBjj\"><script>var infoData = {typePos: \n15\n5, title: \" 看 看 你 的 手 机 号 ， 能 借 多 少 钱 ？ \",\nimgUrl:['http://cdn.iclicash.com/uploads/26115ec51f44d6ab6dfc345801274b69_67_225_150.jpg\n']};</script><script\nsrc=\"//cdn.iclicash.com/htmljs/bda4bfcb7979dc043b8178cb822a5bc3.js\"></script>\n</body>",
-            "native_material": {
-                "type": 0,
-                "interaction_type": 1,
-                "image_snippet": "",
-                "text_icon_snippet": "",
-                "video_snippet": ""
-            },
-            "search_id": "84c6351be8f389c882616d90834e4b243d18d262"
-        }
+        "material_type": 1,
+        "html_snippet": "",
+        "native_material": {
+            "type": 2,
+            "interaction_type": 1,
+            "image_snippet": "{\"url\":\"http://cdn.aiclk.com//uploads/28a7994bcec1dea054752f399ec03657_1539387_690_360.gif\",\"c_url\":\"http://testrcv.aiclk.com/click?CAAQMg.EOOteWSTZWIo1vdz1a74ZN6zZ537Z57oZN6UZNP9SUS7SaPfPaZ9Sadm1NnP4pepfj6nzqeeonoBlOLI05OAZ5OUZadtOXL3tv9o1hKC1h3tPv3iMu9DMWA_XbrzZNI9ZaPAOaLOjnLIyOdjWDaLOkO5tD4ICsiFd0kp1XagBW7L4G0XONnEjO2QOWE6ucOoQOStXjnXdIrEPicXEiAXQJ3or5LGlUS7Mk9bMv2uFEmVrUrCMTxoluqDMWzbQh3HruczSNZ9ZbnflbHTPN7bSU17Pv2DParo1vSa05Ou05S7PNnmSbIUSTPmlUHC1Wx4lTDoMvAsraou0NjUKTHaMWHaPhSLrUH7wvSTZWIo1vdz1a74ZN6zZ537Z57oZN6UZNP9SUS7SaPfPaZ9Sadm1NnTMTxfFhSHraozrnoIO3IOenrfZNdu0NIU8nXB5TSoraKVMU3HM5ozlhPu8D2aFyKVMU3HM5ozlvSUrHqU0hLO8nzarWSD1W9mMNLzSNXBEWFbrW3a0a6A8nDDrfKDMTgBShLSMTqkMf3oMUmiMTFD1JLlPyS7FhXmrUxu0aKBdTSGQv9bQh3HwNZAS5ZzlNd40JLZPfXVMvHCPTH70a7U8D3VQv9aFJKbFJIq0N6AZJAuSNOAZJLZrf39MWxaMUHC0aIA8DXaMUHCFWHV1vFDr5LbSaOA8DSf1vzTPhKHPv3AMfSiFWHGMaLu8n9H8JXaFJK-rWqf1hIBZfL0PU2gQvKuPh3iMU4qMU9BdvSorTmG1WxgwNdVFaIVFvH7nndOknJ1OjnXdnnIXXOdWOInOXLeEOdtXJD48JnPONeKO6mG8THgMWdGSt4AIEDZQv9m85gnjv97rTqi1EOolajCZagnNTx4FhZnSEXEFvHg1EqlNmjo06niId2ArWzHxUxktUHolb6bSu4bSkOLtoD6N6AgIWziQU6n3UxaQUciIdSLrTqV1tcbSE4Alad4S5rCZNdoIdmGPTHg1tXNPv1DrT7GSNZflaZU0OKEXJD48JDeI5nmZb6zSTIA1aX7SvIASTdb1aSTSaj4ZWZfSbdmZTdb6IO2vwOIPKZ6QOWtOjAIOzIIEOdjXDndIOEkOjzarWZVrUxo1hSoZ5WnXnEuXnnjOEOO0OXOOMLWdjLSZad4laPUladU0t4fZ3OX\",\"width\":690,\"height\":360,\"imp\":[\"http://testrcv.aiclk.com/show?CAAQHw.0vfEndQURdjzM_fkM-8qRhKkR1i8R18zRhKORharQOQ8Q-aCa-RrQ-fHMhxaqGnGCpKxksnnzxzT4vPju1vZR1vOR-fEvyPiE_rzMXbtMXiEa_iA6JrF6dZYyNlkRhjrR-aZv-PvpxxjWvfpdF-Pv8Pl04mTXi1PmUpaeuFAnu4Nxpfqv8vy_xyxoRmvQ3j30vfpFZbJ1pxyfxvYyNlkRhjrR-MTvLPuaCiJRUHmMdV5Shfw2-bTf_QOlUHmMdV5ShfwaCMJXCarcxyT1dQZaO386WVwu-fHRLPjMCQZMdRTQhyT0d3NlU3tBNPHcxHt6Obm2Lim6_otMO38cxwIlOiHlLVNMXjTRWPEaOsA6WQA2dKsRNvzRNfwRhxqcxk-ldHwB_rIB_pTuhMT3dHA6UQzlWQzl-zrQhvZg1jHR1vZcxkN2Lo5M_QmB_qTR-yTfdQmB_rzB_HoMO3Zu-ROR1yTfC2o6dMFlUVFMLymlOozB_stu-bT1UVqldQzlosZ6C2ol-PNcxr-a_kAaWbF2dom6-Hm6WPiaCiJ6_s8M_ZsREHORIHHB_Envipjvijj0vppyyx0jvvqv8jfcLFqcnvdvQvdvv\"],\"clk\":[],\"title\":\"在家用微信赚钱，日赚千元，好羡慕！！！\",\"desc\":\"\"}",
+            "text_icon_snippet": "",
+            "video_snippet": "",
+            "motivate_snippet": "",
+            "ext": "{\"sex\":0,\"coin\":0}"
+        },
+        "bottoming_snippet": ""
     }
+}
+```
+
+#### 失败返回
+
+`http code` 200
+
+```json
+{
+    "code": 400,
+    "message": "当前广告位没上线",
+    "data": null
 }
 ```
 
 ## 获取渠道流量占比
 
-`get` `{host}/api/channel/ratio?sign=xxx&app_id=xxx`
+`get` `{host}/api/channel/ratio?app_id=xxx`
 
 ### query参数
-
-`sign`接口签名
 
 `app_id`账号
 
@@ -160,34 +238,91 @@
 ```json
 {
     "code": 200,
+    "key": "fc2cc3afaf58fb9fc9131f2e385b1784",
     "data": [
         {
-            "id": 1, // 渠道ID
-            "name": "Fahey, Rosenbaum and Rutherford", // 渠道名称
-            "ratio": 22, //占比
-            "method": "api" //对接方式
+            "ad_place_id": 1,                 // 该媒体在在我们平台的广告位ID，
+            "channels": [                     // 该媒体对应的多个渠道，但只对应一个渠道的一个广告位
+                {
+                    "id": 9,                  // 渠道ID
+                    "name": "Altenwerth Inc", // 渠道名称
+                    "ratio": 33,              // 我们的广告位在该渠道下的占比
+                    "method": "api",          // 对接方式
+                    "ad_place_id": "170043"   // 该渠道下对应的广告位
+                },
+                {
+                    "id": 3,
+                    "name": "Crona-Rogahn",
+                    "ratio": 67,
+                    "method": "api",
+                    "ad_place_id": "183746"
+                }
+            ]
         },
         {
-            "id": 2,
-            "name": "Wolff-Schmitt",
-            "ratio": 34,
-            "method": "material"
-        },
-        {
-            "id": 3,
-            "name": "Gutmann-Herzog",
-            "ratio": 44,
-            "method": "api"
+            "ad_place_id": 2,
+            "channels": [
+                {
+                    "id": 9,
+                    "name": "Altenwerth Inc",
+                    "ratio": 33,
+                    "method": "api",
+                    "ad_place_id": "146154"
+                },
+                {
+                    "id": 3,
+                    "name": "Crona-Rogahn",
+                    "ratio": 23,
+                    "method": "api",
+                    "ad_place_id": "183746"
+                },
+                {
+                    "id": 4,
+                    "name": "Dooley, Franecki and Mosciski",
+                    "ratio": 44,
+                    "method": "api",
+                    "ad_place_id": "135364"
+                }
+            ]
         }
     ]
 }
 ```
 
-## 提交统计
+## 提交曝光统计
 
-`post` `{host}/api/statistics?sign=xxx&app_id=xxx`
+`post` `{host}/api/statistics/exposure?sign=xxx&app_id=xxx`
 
 ### post参数
+
+`ad_place_id` 广告位ID
+
+`channel_id` 渠道ID
+
+`channel_ad_place_id` 渠道广告位ID
+
+### 成功返回
+
+```json
+{
+    "code": 200,
+    "message": "ok",
+    "data": null
+}
+```
+
+
+## 提交点击统计
+
+`post` `{host}/api/statistics/click?sign=xxx&app_id=xxx`
+
+### post参数
+
+`ad_place_id` 广告位ID
+
+`channel_id` 渠道ID
+
+`channel_ad_place_id` 渠道广告位ID
 
 ### 成功返回
 

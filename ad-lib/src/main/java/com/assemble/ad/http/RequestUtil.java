@@ -187,7 +187,7 @@ public class RequestUtil {
     private String getPostBodyType(Map<String, String> paramsMap, String jsonStr) {
         if (paramsMap != null) {
             //return "text/plain";不知为什么这儿总是报错。目前暂不设置(20170424)
-            return null;
+            return "application/x-www-form-urlencoded;charset=utf-8";
         } else if (!TextUtils.isEmpty(jsonStr)) {
             return "application/json;charset=utf-8";
         }

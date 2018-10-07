@@ -1,42 +1,51 @@
 package com.assemble.ad.bean;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 public class RatioBean {
 
-    private int id;
-    private String name;
-    private int ratio;
-    private String method;
+    public String ad_place_id;
+    public ArrayList<ChannelsBean> channels;
 
-    public int getId() {
-        return id;
+    public RatioBean(String json) {
+        try {
+            JSONObject object = new JSONObject(json);
+            this.ad_place_id = object.optString("ad_place_id", "");
+            this.channels = new ArrayList<>();
+            JSONArray array = object.getJSONArray("channels");
+            for (int i = 0; i < array.length(); i++) {
+                ChannelsBean channelsBean = new ChannelsBean(array.getJSONObject(i).toString());
+                channels.add(channelsBean);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public static class ChannelsBean {
 
-    public String getName() {
-        return (name != null) ? name : "";
-    }
+        public String id;
+        public String name;
+        public int ratio;
+        public String method;
+        public String ad_place_id;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getRatio() {
-        return ratio;
-    }
-
-    public void setRatio(int ratio) {
-        this.ratio = ratio;
-    }
-
-    public String getMethod() {
-        return (method != null) ? method : "";
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
+        public ChannelsBean(String json) {
+            try {
+                JSONObject object = new JSONObject(json);
+                this.id = object.optString("id", "");
+                this.name = object.optString("name", "");
+                this.ratio = object.optInt("ratio");
+                this.method = object.optString("method", "");
+                this.ad_place_id = object.optString("ad_place_id", "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

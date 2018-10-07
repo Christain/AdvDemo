@@ -11,7 +11,7 @@ import android.widget.Toast;
 public class AdvFactory {
 
     public static final int PLATFORM_AICLK = 1000;
-    public static final int PLATFORM_OTHER = 2000;
+    public static final int PLATFORM_API = 2000;
     public static final int MATERIAL_DYNAMIC = 0x101;
     public static final int MATERIAL_NATIVE = 0x102;
     public static final int CONTENT_UNKNOWN = 0x103;
@@ -32,12 +32,6 @@ public class AdvFactory {
         mAdvNetRequest = new AdvNetRequest(mActivity);
         return mAdvNetRequest;
     }
-
-//    public AdvNetRequest getAdvNetRequest(ICliUtils.AdContentListener listener) {
-//        mAdRequest = new AdvNetRequest(mActivity);
-//        mAdRequest.bindAdContentListener(listener);
-//        return mAdRequest;
-//    }
 
     /**
      * 申请权限

@@ -1,6 +1,6 @@
 package com.assemble.ad.ui;
 
-import com.assemble.ad.core.ApiAdRequest;
+import com.assemble.ad.core.ApiRequest;
 import com.iclicash.advlib.core.AdRequest;
 
 public interface CommonBanner {
@@ -13,6 +13,8 @@ public interface CommonBanner {
 
     void setAiclkAdRequest(AdRequest adRequest);
 
-    void setApiAdRequest(ApiAdRequest apiAdRequest);
+    void setApiAdRequest(ApiRequest apiRequest);
+
+    void onAiclkShowedReport(String adslot, String placeId, String channelId);
 
 }
